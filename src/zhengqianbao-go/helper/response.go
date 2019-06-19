@@ -20,3 +20,9 @@ type Gene_Response struct {
 	Code int    `json:"code"`
 	Msg  string `json:"msg"`
 }
+
+type Data_Response struct {
+	Code int               `json:"code"`
+	Msg  string            `json:"msg"`
+	Data map[string]string `json:"data"`
+}

@@ -7,6 +7,7 @@ package models
 // for the shake of simplicty.
 type User struct {
 	Phone       string `json:"phone"`
+	Remain      int    `json:"remain"`
 	Iscow       bool   `json:"iscow"`
 	Name        string `json:"name"`
 	Password    string `json:"password"`
@@ -15,5 +16,5 @@ type User struct {
 	University  string `json:"university"`
 	Company     string `json:"company"`
 	Description string `json:"description"`
-	Class       int    `json:"class"`
+	Class       string `json:"class"`
 }
