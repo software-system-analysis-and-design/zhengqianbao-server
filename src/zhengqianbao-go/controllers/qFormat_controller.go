@@ -4,6 +4,8 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
+	"strings"
+	"time"
 
 	"../global"
 	"../models"
@@ -24,6 +26,24 @@ type QFormat_Interface interface {
 	DeleteQFormat(id string) (ok bool)
 
 	SelectAllQFormats() (taskPreviews []models.TaskPreview, ok bool)
+
+	SelectValidFormats() (taskPreviews []models.TaskPreview, ok bool)
+
+	SearchQFormats(str string) (taskPreviews []models.TaskPreview, ok bool)
+
+	AddOneQFormats(id string) (ok bool)
+}
+
+func (r *DBRepository) AddOneQFormats(id string) (ok bool) {
+	qFormatObj, ok := r.SelectQFormat(id)
+	if !ok {
+		fmt.Printf("update fail")
+		return false
+	}
+	qFormatObj.FinishedNumber++
+	_, ok = r.UpdateQFormat(id, qFormatObj)
+
+	return ok
 }
 
 func (r *DBRepository) QueryQFormat(id string) (ok bool) {
@@ -169,7 +189,7 @@ func (r *DBRepository) SelectAllQFormats() (taskPreviews []models.TaskPreview, o
 		global.Host, global.Port, global.User, global.Password, global.Dbname)
 	db, err := sql.Open("postgres", psqlInfo)
 	if err != nil {
-		fmt.Printf("could not insert qFormat, %v", err)
+		fmt.Printf("could not open database, %v", err)
 		db.Close()
 		return nil, false
 	}
@@ -195,6 +215,91 @@ func (r *DBRepository) SelectAllQFormats() (taskPreviews []models.TaskPreview, o
 		}
 		if state == 0 {
 			taskPreviews = append(taskPreviews, tPreviewObj)
+		}
+
+	}
+
+	db.Close()
+	return taskPreviews, true
+}
+
+func (r *DBRepository) SearchQFormats(str string) (taskPreviews []models.TaskPreview, ok bool) {
+	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
+		global.Host, global.Port, global.User, global.Password, global.Dbname)
+	db, err := sql.Open("postgres", psqlInfo)
+	if err != nil {
+		fmt.Printf("could not open database, %v", err)
+		db.Close()
+		return nil, false
+	}
+
+	rows, err := db.Query("select * from t_qformat")
+
+	if err != nil {
+		fmt.Printf("could not select qFormat, %v", err)
+		db.Close()
+		return nil, false
+	}
+
+	for rows.Next() {
+		var tPreviewObj = models.TaskPreview{}
+		var chooseData string
+		var state int
+		err = rows.Scan(&tPreviewObj.TaskID, &tPreviewObj.TaskName, &tPreviewObj.InTrash, &tPreviewObj.TaskType, &tPreviewObj.Creator, &tPreviewObj.Description,
+			&tPreviewObj.Money, &tPreviewObj.Number, &tPreviewObj.FinishedNumber, &tPreviewObj.PublishTime, &tPreviewObj.EndTime, &chooseData)
+		if err != nil {
+			fmt.Printf("could not scan rows, %v", err)
+			db.Close()
+			return nil, false
+		}
+
+		if state == 0 && strings.Contains(tPreviewObj.TaskName, str) {
+			taskPreviews = append(taskPreviews, tPreviewObj)
+		}
+
+	}
+
+	db.Close()
+	return taskPreviews, true
+}
+
+func (r *DBRepository) SelectValidFormats() (taskPreviews []models.TaskPreview, ok bool) {
+
+	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
+		global.Host, global.Port, global.User, global.Password, global.Dbname)
+	db, err := sql.Open("postgres", psqlInfo)
+	if err != nil {
+		fmt.Printf("could not open database, %v", err)
+		db.Close()
+		return nil, false
+	}
+
+	rows, err := db.Query("select * from t_qformat")
+
+	if err != nil {
+		fmt.Printf("could not select qFormat, %v", err)
+		db.Close()
+		return nil, false
+	}
+
+	for rows.Next() {
+		var tPreviewObj = models.TaskPreview{}
+		var chooseData string
+		err = rows.Scan(&tPreviewObj.TaskID, &tPreviewObj.TaskName, &tPreviewObj.InTrash, &tPreviewObj.TaskType, &tPreviewObj.Creator, &tPreviewObj.Description,
+			&tPreviewObj.Money, &tPreviewObj.Number, &tPreviewObj.FinishedNumber, &tPreviewObj.PublishTime, &tPreviewObj.EndTime, &chooseData)
+		if err != nil {
+			fmt.Printf("could not scan rows, %v", err)
+			db.Close()
+			return nil, false
+		}
+		if tPreviewObj.InTrash == 0 {
+			timeTemplate := "2006-01-02T15:04"
+			publicStamp, _ := time.ParseInLocation(timeTemplate, tPreviewObj.PublishTime, time.Local)
+			finishStamp, _ := time.ParseInLocation(timeTemplate, tPreviewObj.EndTime, time.Local)
+			if publicStamp.Unix() < time.Now().Unix() && finishStamp.Unix() > time.Now().Unix() {
+				taskPreviews = append(taskPreviews, tPreviewObj)
+			}
+
 		}
 
 	}

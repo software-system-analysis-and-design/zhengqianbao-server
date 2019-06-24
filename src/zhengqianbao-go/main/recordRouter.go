@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 
 	"../controllers"
 	"../helper"
@@ -58,6 +59,7 @@ func RecordCreateHandler(ctx iris.Context) {
 		ctx.JSON(response)
 		return
 	} else {
+		dbInstance.AddOneQFormats(recordObj.TaskID)
 		response := helper.Gene_Response{
 			Code: 200,
 			Msg:  "插入成功！",
@@ -73,6 +75,39 @@ func RecordSelectHandler(ctx iris.Context) {
 	taskID := ctx.FormValue("taskID")
 	dbInstance := controllers.GetDBInstance()
 	recordObj, ok := dbInstance.SelectRecord(taskID, phoneID)
+	if ok {
+		ctx.JSON(recordObj)
+		return
+	} else {
+		response := helper.Gene_Response{
+			Code: 400,
+			Msg:  "获取任务失败！",
+		}
+		ctx.JSON(response)
+		return
+	}
+}
+
+func RecordGetAllHandler(ctx iris.Context) {
+	userMsg := ctx.Values().Get("jwt").(*jwt.Token).Claims.(jwt.MapClaims)
+	phoneID := userMsg["phone"].(string)
+	taskID := ctx.FormValue("taskID")
+	dbInstance := controllers.GetDBInstance()
+
+	qFormatObj, ok := dbInstance.SelectQFormat(taskID)
+
+	if !ok || qFormatObj.Creator != phoneID {
+		fmt.Println(qFormatObj.Creator)
+		fmt.Println(phoneID)
+		response := helper.Gene_Response{
+			Code: 400,
+			Msg:  "该问卷不存在！",
+		}
+		ctx.JSON(response)
+		return
+	}
+
+	recordObj, ok := dbInstance.SelectAllRecords(taskID)
 	if ok {
 		ctx.JSON(recordObj)
 		return

@@ -20,6 +20,8 @@ type User_Interface interface {
 
 	UpdateUser(phone string, user *models.User) (updatedUser *models.User, ok bool)
 
+	UpdateMoney(phone string, money int) (ok bool)
+
 	DeleteUser(phone string) (ok bool)
 }
 
@@ -94,7 +96,7 @@ func (r *DBRepository) UpdateUser(phone string, user *models.User) (updatedUser 
 	ok = true
 
 	stmt, err := db.Prepare("update t_user set iscow=$1, name=$2, password=$3, gender=$4, age=$5, " +
-		"university=$6, company=$7, description=$8, class=$9 WHERE  phone=$10")
+		"university=$6, company=$7, description=$8, class=$9 WHERE phone=$10")
 	if err != nil {
 		ok = false
 	}
@@ -106,6 +108,25 @@ func (r *DBRepository) UpdateUser(phone string, user *models.User) (updatedUser 
 	db.Close()
 
 	return user, ok
+}
+
+func (r *DBRepository) UpdateMoney(phone string, money int) (ok bool) {
+	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
+		global.Host, global.Port, global.User, global.Password, global.Dbname)
+	db, err := sql.Open("postgres", psqlInfo)
+	ok = true
+
+	stmt, err := db.Prepare("update t_user set remain=$1 WHERE phone=$2")
+	if err != nil {
+		ok = false
+	}
+	_, err = stmt.Exec(money, phone)
+	if err != nil {
+		ok = false
+	}
+	db.Close()
+
+	return ok
 }
 
 func checkErr(err error) {

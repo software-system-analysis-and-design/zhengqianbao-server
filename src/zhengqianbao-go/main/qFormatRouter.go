@@ -19,6 +19,12 @@ func QPreviewHandler(ctx iris.Context) {
 
 }
 
+func QPreviewValidHandler(ctx iris.Context) {
+	dbInstance := controllers.GetDBInstance()
+	previews, _ := dbInstance.SelectValidFormats()
+	ctx.JSON(previews)
+}
+
 func QCreateHandler(ctx iris.Context) {
 
 	userMsg := ctx.Values().Get("jwt").(*jwt.Token).Claims.(jwt.MapClaims)
@@ -102,6 +108,25 @@ func QSelectHandler(ctx iris.Context) {
 	qFormatObj, ok := dbInstance.SelectQFormat(id)
 	if ok {
 		ctx.JSON(qFormatObj)
+		return
+	} else {
+		response := helper.Gene_Response{
+			Code: 400,
+			Msg:  "获取任务失败！",
+		}
+		ctx.JSON(response)
+		return
+	}
+}
+
+func QSearchHandler(ctx iris.Context) {
+
+	keyword := ctx.FormValue("keyword")
+	dbInstance := controllers.GetDBInstance()
+
+	qFormats, ok := dbInstance.SearchQFormats(keyword)
+	if ok {
+		ctx.JSON(qFormats)
 		return
 	} else {
 		response := helper.Gene_Response{

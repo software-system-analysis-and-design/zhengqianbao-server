@@ -20,6 +20,8 @@ type Record_Interface interface {
 	UpdateRecord(taskID string, userID string, record *models.Record) (ok bool)
 
 	DeleteRecord(taskID string, userID string) (ok bool)
+
+	SelectAllRecords(taskID string) (records []models.Record, ok bool)
 }
 
 func (r *DBRepository) SelectRecord(taskID string, userID string) (record *models.Record, ok bool) {
@@ -52,6 +54,34 @@ func (r *DBRepository) SelectRecord(taskID string, userID string) (record *model
 
 	db.Close()
 	return &recordObj, true
+}
+
+func (r *DBRepository) SelectAllRecords(taskID string) (records []models.Record, ok bool) {
+	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
+		global.Host, global.Port, global.User, global.Password, global.Dbname)
+	db, err := sql.Open("postgres", psqlInfo)
+	rows, err := db.Query("select * from t_record where taskId=$1", taskID)
+
+	for rows.Next() {
+		recordObj := models.Record{}
+		var chooseData string
+		err = rows.Scan(&recordObj.TaskID, &recordObj.UserID, &chooseData)
+		if err != nil {
+			fmt.Printf("could not find record, %v", err)
+			db.Close()
+			return nil, false
+		}
+		err = json.Unmarshal([]byte(chooseData), &recordObj.Data)
+		if err != nil {
+			fmt.Printf("could not Unmarshal json, %v", err)
+			db.Close()
+			return nil, false
+		}
+		records = append(records, recordObj)
+	}
+
+	db.Close()
+	return records, true
 }
 
 func (r *DBRepository) InsertRecord(record *models.Record) (ok bool) {

@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"testing"
+	"time"
 
 	"../controllers"
 	"../models"
@@ -125,5 +126,21 @@ func TestUpdateQFormats(t *testing.T) {
 	if !ok || updatedQFormats.TaskName != "task1" {
 		t.Errorf("Test Insert FAIL")
 	}
+
+}
+
+func TestTimerQFormats(t *testing.T) {
+	timeTemplate := "2006-01-02T15:04"
+	t_str := "2019-06-23T10:20"
+
+	timestamp := time.Now().Unix()
+	tm := time.Unix(timestamp, 0)
+	fmt.Println(tm.Format(timeTemplate))
+
+	stamp, err := time.ParseInLocation(timeTemplate, t_str, time.Local)
+	if err != nil {
+		fmt.Println(err)
+	}
+	println(stamp.Unix(), time.Now().Unix())
 
 }

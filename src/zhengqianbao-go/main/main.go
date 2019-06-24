@@ -56,6 +56,8 @@ func main() {
 	user.Options("/profile", jwtHandler.Serve, userTokenHandler, userProfileHandler)
 	user.Post("/update", jwtHandler.Serve, userTokenHandler, userUpdateHandler)
 	user.Options("/update", jwtHandler.Serve, userTokenHandler, userUpdateHandler)
+	user.Post("/updatemoney", jwtHandler.Serve, userTokenHandler, moneyUpdateHandler)
+	user.Options("/updatemoney", jwtHandler.Serve, userTokenHandler, moneyUpdateHandler)
 
 	// questionnaire
 	questionnaire := app.Party("/questionnaire")
@@ -69,8 +71,11 @@ func main() {
 	questionnaire.Options("/delete", jwtHandler.Serve, QDeleteHandler)
 	questionnaire.Post("/trash", jwtHandler.Serve, QTrashHandler)
 	questionnaire.Options("/trash", jwtHandler.Serve, QTrashHandler)
+	questionnaire.Get("/previews/valid", QPreviewValidHandler)
+	questionnaire.Post("/search", QSearchHandler)
+	questionnaire.Options("/search", QSearchHandler)
 
-	// update
+	// record
 	record := app.Party("/record")
 	record.Post("/create", jwtHandler.Serve, RecordCreateHandler)
 	record.Options("/create", jwtHandler.Serve, RecordCreateHandler)
@@ -80,6 +85,25 @@ func main() {
 	record.Options("/update", jwtHandler.Serve, RecordUpdateHandler)
 	record.Post("/delete", jwtHandler.Serve, RecordDeleteHandler)
 	record.Options("/delete", jwtHandler.Serve, RecordDeleteHandler)
+	record.Post("/getall", jwtHandler.Serve, RecordGetAllHandler)
+	record.Options("/getall", jwtHandler.Serve, RecordGetAllHandler)
+
+	// message
+	message := app.Party("/message")
+	message.Post("/select", jwtHandler.Serve, GetMsgHandler)
+	message.Options("/select", jwtHandler.Serve, GetMsgHandler)
+	message.Get("/count", jwtHandler.Serve, GetMsgCount)
+	message.Options("/count", jwtHandler.Serve, GetMsgCount)
+	message.Post("/read", jwtHandler.Serve, ReadMessage)
+	message.Options("/read", jwtHandler.Serve, ReadMessage)
+	message.Post("/delete", jwtHandler.Serve, DeleteMessage)
+	message.Options("/delete", jwtHandler.Serve, DeleteMessage)
+	message.Get("/getall", jwtHandler.Serve, GetAllMessages)
+	message.Options("/getall", jwtHandler.Serve, GetAllMessages)
+	message.Get("/getread", jwtHandler.Serve, GetReadMessages)
+	message.Options("/getread", jwtHandler.Serve, GetReadMessages)
+	message.Get("/getunread", jwtHandler.Serve, GetUnReadMessages)
+	message.Options("/getunread", jwtHandler.Serve, GetUnReadMessages)
 
 	app.Run(
 		// Start the web server at localhost:8080
@@ -90,6 +114,7 @@ func main() {
 		// enables faster json serialization and more:
 		iris.WithOptimizations,
 	)
+	CreateMsgBackend()
 }
 
 func CorsMiddleware(ctx iris.Context) {

@@ -77,7 +77,7 @@ func userLoginHandler(ctx iris.Context) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"phone":    phone,
 		"password": password,
-		"exp":      time.Now().Add(time.Hour * 2).Unix(), // 添加过期时间
+		"exp":      time.Now().Add(time.Hour * 2000).Unix(), // 添加过期时间
 	})
 
 	tokenString, _ := token.SignedString([]byte("My Secret"))
@@ -129,6 +129,36 @@ func userUpdateHandler(ctx iris.Context) {
 		response := helper.Register_Response{
 			Code: 200,
 			Msg:  "更新成功！",
+		}
+		ctx.JSON(response)
+	} else {
+		response := helper.Register_Response{
+			Code: 400,
+			Msg:  "更新失败！",
+		}
+		ctx.JSON(response)
+	}
+
+}
+
+func moneyUpdateHandler(ctx iris.Context) {
+	dbInstance := controllers.GetDBInstance()
+	userMsg := ctx.Values().Get("jwt").(*jwt.Token).Claims.(jwt.MapClaims)
+	tokenPhone := userMsg["phone"].(string)
+
+	money, _ := strconv.Atoi(ctx.FormValue("money"))
+
+	ok := dbInstance.UpdateMoney(tokenPhone, money)
+	if ok == true {
+		response := helper.Register_Response{
+			Code: 200,
+			Msg:  "更新成功！",
+		}
+		ctx.JSON(response)
+	} else {
+		response := helper.Register_Response{
+			Code: 400,
+			Msg:  "更新失败！",
 		}
 		ctx.JSON(response)
 	}
