@@ -10,20 +10,28 @@ import (
 )
 
 type Message_Interface interface {
+	// 获取指定消息
 	SelectMessage(messageID string) (message *models.Message, ok bool)
 
+	// 获取未读消息个数
 	GetCount(userID string) (count int, ok bool)
 
+	// 获取所有消息
 	GetAllMessage(userID string) (messages []models.Message, ok bool)
 
+	// 新建消息
 	InsertMessage(message *models.Message) (ok bool)
 
+	// 更改消息的已读状态
 	ReadMessage(messageID string, userID string, state int) (ok bool)
 
+	// 删除消息
 	DeleteMessage(messageID string, userID string) (ok bool)
 
+	// 获取所有的未读消息
 	GetUnReadMessage(userID string) (messages []models.Message, ok bool)
 
+	// 获取所有的已读消息
 	GetReadMessage(userID string) (messages []models.Message, ok bool)
 }
 

@@ -1,6 +1,8 @@
 package main
 
 import (
+	"fmt"
+
 	jwt "github.com/dgrijalva/jwt-go"
 	"github.com/iris-contrib/middleware/cors"
 	jwtmiddleware "github.com/iris-contrib/middleware/jwt"
@@ -118,6 +120,9 @@ func main() {
 }
 
 func CorsMiddleware(ctx iris.Context) {
+	fmt.Println(ctx.Path())
+	fmt.Println(ctx.FormValues())
+
 	method := ctx.Request().Method
 
 	//放行所有OPTIONS方法

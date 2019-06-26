@@ -12,19 +12,26 @@ import (
 type Query func(models.User) bool
 
 type User_Interface interface {
+	// 对用户信息进行查询
 	QueryUser(phone string) (ok bool)
 
+	// 选择指定ID的用户
 	SelectUser(phone string) (user *models.User, ok bool)
 
+	// 新建用户
 	InsertUser(user *models.User) (ok bool)
 
+	// 更新用户信息
 	UpdateUser(phone string, user *models.User) (updatedUser *models.User, ok bool)
 
+	// 更新用户余额
 	UpdateMoney(phone string, money int) (ok bool)
 
+	// 删除用户
 	DeleteUser(phone string) (ok bool)
 }
 
+// QueryUser 对用户信息进行查询
 func (r *DBRepository) QueryUser(phone string) (ok bool) {
 
 	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
@@ -43,6 +50,7 @@ func (r *DBRepository) QueryUser(phone string) (ok bool) {
 	return ok
 }
 
+// SelectUser 选择指定ID的用户
 func (r *DBRepository) SelectUser(phone string) (user *models.User, ok bool) {
 
 	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
@@ -65,6 +73,7 @@ func (r *DBRepository) SelectUser(phone string) (user *models.User, ok bool) {
 	return &userObj, ok
 }
 
+// InsertUser 新建用户
 func (r *DBRepository) InsertUser(userObj *models.User) (ok bool) {
 
 	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
@@ -88,6 +97,7 @@ func (r *DBRepository) InsertUser(userObj *models.User) (ok bool) {
 	return ok
 }
 
+// UpdateUser 更行用户信息
 func (r *DBRepository) UpdateUser(phone string, user *models.User) (updatedUser *models.User, ok bool) {
 
 	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
@@ -110,6 +120,7 @@ func (r *DBRepository) UpdateUser(phone string, user *models.User) (updatedUser 
 	return user, ok
 }
 
+// UpdateMoney 更新用户余额
 func (r *DBRepository) UpdateMoney(phone string, money int) (ok bool) {
 	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
 		global.Host, global.Port, global.User, global.Password, global.Dbname)

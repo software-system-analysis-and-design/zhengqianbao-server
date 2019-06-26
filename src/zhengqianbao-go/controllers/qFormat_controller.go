@@ -13,24 +13,34 @@ import (
 )
 
 type QFormat_Interface interface {
+	// 根据ID查询问卷是否存在
 	QueryQFormat(id string) (ok bool)
 
+	// 根据ID获取指定问卷
 	SelectQFormat(id string) (qFormat *models.QuestionnaireFormat, ok bool)
 
+	// 新建问卷
 	InsertQFormat(qFormat *models.QuestionnaireFormat) (ok bool, id string)
 
+	// 更新问卷
 	UpdateQFormat(id string, qFormat *models.QuestionnaireFormat) (updatedQFormat *models.QuestionnaireFormat, ok bool)
 
+	// 将问卷移动到回收站
 	TrashQFormat(id string, inTrash int) (ok bool)
 
+	// 删除问卷
 	DeleteQFormat(id string) (ok bool)
 
+	// 获取所有问卷
 	SelectAllQFormats() (taskPreviews []models.TaskPreview, ok bool)
 
+	// 获取所有有效问卷
 	SelectValidFormats() (taskPreviews []models.TaskPreview, ok bool)
 
+	// 根据关键字搜索问卷
 	SearchQFormats(str string) (taskPreviews []models.TaskPreview, ok bool)
 
+	// 添加问卷的回答个数
 	AddOneQFormats(id string) (ok bool)
 }
 

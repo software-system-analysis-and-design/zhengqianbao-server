@@ -165,6 +165,7 @@ func moneyUpdateHandler(ctx iris.Context) {
 }
 
 func userProfileHandler(ctx iris.Context) {
+
 	userMsg := ctx.Values().Get("jwt").(*jwt.Token).Claims.(jwt.MapClaims)
 	phone := userMsg["phone"].(string)
 	dbInstance := controllers.GetDBInstance()

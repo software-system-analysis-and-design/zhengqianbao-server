@@ -11,16 +11,22 @@ import (
 )
 
 type Record_Interface interface {
+	// 查询记录
 	QueryRecord(taskID string, userID string) (ok bool)
 
+	// 获取记录
 	SelectRecord(taskID string, userID string) (record *models.Record, ok bool)
 
+	// 新建记录
 	InsertRecord(record *models.Record) (ok bool)
 
+	// 更新记录
 	UpdateRecord(taskID string, userID string, record *models.Record) (ok bool)
 
+	// 删除记录
 	DeleteRecord(taskID string, userID string) (ok bool)
 
+	// 获取所有记录
 	SelectAllRecords(taskID string) (records []models.Record, ok bool)
 }
 
@@ -35,7 +41,6 @@ func (r *DBRepository) SelectRecord(taskID string, userID string) (record *model
 	var chooseData string
 
 	rows.Next()
-	fmt.Println(taskID, userID)
 	err = rows.Scan(&recordObj.TaskID, &recordObj.UserID, &chooseData)
 
 	if err != nil {
