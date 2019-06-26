@@ -21,3 +21,14 @@ go run main.go
 ## 使用说明
 
 后台代码目前已经挂在到腾讯云服务器
+
+## API设计文档
+
+[Interface API design](https://software-system-analysis-and-design.github.io/Dashboard/docs/API.html)
+
+## 数据库设计文档
+
+- 7.2.1 [用户及权限系统数据库设计](https://software-system-analysis-and-design.github.io/Dashboard/docs/db_design.html)
+- 7.2.2 [ER模型和关系模型](https://software-system-analysis-and-design.github.io/Dashboard/docs/db_er.html)
+- 7.2.3 [第三方数据评审结果](https://github.com/software-system-analysis-and-design/Dashboard/issues/1)
+
